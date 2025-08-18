@@ -1,4 +1,4 @@
-This GitHub folder contains the source files for reproducing the main results in the paper https://arxiv.org/abs/2508.06614.
+This GitHub folder contains the source files for reproducing the main results involving the MNIST dataset in the paper https://arxiv.org/abs/2508.06614.
 
 1. **Notebooks** `.ipynb`:
     * `mnist_cmi_heatmap.ipynb`: calculates the conditional mutual information of the distribution of $60,000$ MNIST images with size $28 \times 28$.
