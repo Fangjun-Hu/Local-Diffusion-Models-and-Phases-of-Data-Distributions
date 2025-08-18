@@ -3,7 +3,7 @@ This GitHub folder contains the source files for reproducing the main results in
 1. **Notebooks** `.ipynb`:
     * `fashion-mnist_cmi_heatmap.ipynb`: calculates the conditional mutual information of the distribution of $60,000$ Fashion-MNIST images with size $28 \times 28$.
     * `fashion-mnist_global_train.ipynb`: trains the global denoisers for Fashion-MNIST, using U-Nets neural networks.
-    * `fashion-mnist_local_train.ipynb`: trains the local denoisers for Fashion-MNIST, using modified U-Nets neural networks. This notebook also tests all the quantitative and qualitative performance of using local denoisers to recover the original MNIST images.
+    * `fashion-mnist_local_train.ipynb`: trains the local denoisers for Fashion-MNIST, using modified U-Nets neural networks. This notebook also tests all the quantitative and qualitative performance of using local denoisers to recover the original Fashion-MNIST images.
     * `fashion-mnist_local_global_gen.ipynb`: shows the performance for local denoisers ($r = 3$), within different time intervals during the denoising process.
 
 2. **Modules** `.py`: Auxiliary codes used in the calculations of global and local denoisers.
