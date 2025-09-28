@@ -1,7 +1,7 @@
 This GitHub folder contains the source files for reproducing the main results involving the MNIST dataset in the paper https://arxiv.org/abs/2508.06614.
 
 1. **Notebooks** `.ipynb`:
-    * `mnist_cmi_heatmap.ipynb`: calculates the conditional mutual information of the distribution of $60,000$ MNIST images with size $28 \times 28$.
+    * `mnist_cmi_heatmap.ipynb`: calculates the conditional mutual information of the distribution of $60,000$ MNIST images.
     * `mnist_global_train.ipynb`: trains the global denoisers for MNIST, using U-Nets neural networks.
     * `mnist_local_train.ipynb`: trains the local denoisers for MNIST, using modified U-Nets neural networks. This notebook also tests all the quantitative and qualitative performance of using local denoisers to recover the original MNIST images.
     * `mnist_local_global_gen.ipynb`: shows the performance for local denoisers ($r = 3$), within different time intervals during the denoising process.
