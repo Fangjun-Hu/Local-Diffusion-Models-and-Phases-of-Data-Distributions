@@ -5,10 +5,8 @@
 Plot Partial CMI Heatmap
 
 This script loads available mutual information data and generates a partial heatmap
-even when some computations are still missing. It will show which data is available
-and create a heatmap with the computed values, leaving blank spaces for missing data.
+even when some computations are still missing. 
 
-Author: Fangjun Hu
 """
 
 import numpy as np
@@ -116,8 +114,19 @@ def plot_partial_heatmap():
     print(f"mi_ABC values: {mi_ABC_list_store}")
     print()
     
-    # Initialize CMI array with NaN (will show as blank in plot)
-    cmi_array = np.full((n_t + 1, max_r), np.nan)
+    # Detect maximum available time step to avoid blank rows
+    if not available_tn:
+        raise ValueError("No available time steps found!")
+    
+    max_available_tn = max(available_tn)
+    print(f"Maximum available tn: {max_available_tn}")
+    print(f"Creating CMI array with shape: ({max_available_tn + 1}, {max_r})")
+    
+    # Initialize CMI array only up to max available tn (no blank rows)
+    cmi_array = np.full((max_available_tn + 1, max_r), np.nan)
+    
+    # Create mapping from available tn to array indices
+    available_tn_array = np.array(sorted(available_tn))
     
     # Load available mi_AB data and compute CMI
     data_loaded = 0
@@ -130,6 +139,7 @@ def plot_partial_heatmap():
             # Compute CMI for all r values for this tn
             for r_idx, r in enumerate(r_list):
                 cmi_value = mi_ABC_list_store[tn] - mi_AB_r_store[r-1]
+                # cmi_array[tn, r_idx] = cmi_value
                 cmi_array[tn, r_idx] = max(0, cmi_value)  # Clip negative values
             
             data_loaded += 1
@@ -146,34 +156,37 @@ def plot_partial_heatmap():
     os.makedirs(output_dir, exist_ok=True)
     
     # Create the heatmap
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 8))
+    
+    # Normalize time axis: 0 to 1 (where 1 corresponds to max_available_tn/n_t)
+    max_normalized_time = max_available_tn / n_t  # Normalize to [0, 1]
     
     # Use a colormap that handles NaN values
     im = plt.imshow(cmi_array, aspect='auto', origin='lower', 
-                    extent=[min(r_list)-0.5, max(r_list)+0.5, 0, 1],
+                    extent=[min(r_list)-0.5, max(r_list)+0.5, 0, max_normalized_time],
                     cmap='viridis', interpolation='nearest')
     
-    plt.colorbar(im, label='Conditional Mutual Information (CMI)')
+    plt.colorbar(im, label='CMI')
     plt.xlabel(r'Neighborhood Radius $r$')
     plt.ylabel(r'Time $t$')
-    plt.title(f'Partial CMI Heatmap ({len(available_tn)}/{n_t+1} time points available)')
+    # plt.title(f'Partial CMI Heatmap ({len(available_tn)}/{n_t+1} time points available)')
     plt.xticks(r_list)
     
-    # Add text annotations to show missing data
-    if missing_tn:
-        for tn in missing_tn:
-            t_value = tn / n_t
-            plt.axhline(y=t_value, color='red', linestyle='--', alpha=0.5, linewidth=0.5)
+    # # Add text annotations to show missing data
+    # if missing_tn:
+    #     for tn in missing_tn:
+    #         t_value = tn / n_t
+    #         plt.axhline(y=t_value, color='red', linestyle='--', alpha=0.5, linewidth=0.5)
     
-    # Add legend for missing data
-    if missing_tn:
-        from matplotlib.lines import Line2D
-        legend_elements = [
-            Line2D([0], [0], color='red', linestyle='--', alpha=0.5, 
-                   label=f'Missing data (tn={missing_tn})'),
-            Line2D([0], [0], color='none', label=f'Available: {len(available_tn)}/{n_t+1} time points')
-        ]
-        plt.legend(handles=legend_elements, loc='upper right', bbox_to_anchor=(1.15, 1))
+    # # Add legend for missing data
+    # if missing_tn:
+    #     from matplotlib.lines import Line2D
+    #     legend_elements = [
+    #         Line2D([0], [0], color='red', linestyle='--', alpha=0.5, 
+    #                label=f'Missing data (tn={missing_tn})'),
+    #         Line2D([0], [0], color='none', label=f'Available: {len(available_tn)}/{n_t+1} time points')
+    #     ]
+    #     plt.legend(handles=legend_elements, loc='upper right', bbox_to_anchor=(1.15, 1))
     
     plt.tight_layout()
     
@@ -201,12 +214,12 @@ def plot_partial_heatmap():
         print("No valid CMI values found!")
     
     # Show completion percentage
-    total_possible = (n_t + 1) * max_r
+    total_possible_for_available = (max_available_tn + 1) * max_r
     computed_values = np.count_nonzero(~np.isnan(cmi_array))
-    completion_pct = 100 * computed_values / total_possible
-    print(f"Completion: {computed_values}/{total_possible} ({completion_pct:.1f}%)")
+    completion_pct = 100 * computed_values / total_possible_for_available
+    print(f"Completion (up to tn={max_available_tn}): {computed_values}/{total_possible_for_available} ({completion_pct:.1f}%)")
     
-    return cmi_array, available_tn, missing_tn, n_t
+    return cmi_array, available_tn, missing_tn, n_t, max_available_tn
 
 def plot_available_data_overview():
     """Create a simple overview plot showing which data is available"""
@@ -258,9 +271,10 @@ if __name__ == "__main__":
         print()
         
         # Then generate the partial heatmap
-        cmi_array, available_tn, missing_tn, n_t = plot_partial_heatmap()
+        cmi_array, available_tn, missing_tn, n_t, max_available_tn = plot_partial_heatmap()
         
         print("\n=== NEXT STEPS ===")
+        print(f"Heatmap shows data up to tn={max_available_tn} (normalized time = {max_available_tn/n_t:.3f})")
         if missing_tn:
             print(f"To complete the heatmap, you need to finish computing:")
             for tn in missing_tn:
