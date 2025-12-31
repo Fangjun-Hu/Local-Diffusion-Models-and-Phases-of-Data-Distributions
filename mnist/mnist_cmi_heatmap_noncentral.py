@@ -49,6 +49,7 @@ nCl = 10
 Ls  = 27   # Linear size
 nr, nc = 27, 27
 dim = nr * nc
+ic, jc = 7, 7
 
 # Generate Gaussian Noise
 mean = 0.0
@@ -65,7 +66,6 @@ noise_full.shape
 def images_to_X_ABC(images):
 
     # Define A and neighborhood B
-    ic, jc = 9, 9
     max_r = (Ls - 1) // 2 - 1
     
     X_A = []
@@ -178,7 +178,6 @@ def sample_batch(X_samples, Z_samples, batch_size=500, reshuffle=True, resample_
         X_batch_marg = X_batch_joint[idx_marg]
         Z_batch_marg = Z_batch_joint[idx_marg]
 
-    ic, jc = 9, 9
     if resample_surroundings == True:
         XZ_joint = deepcopy(Z_batch_joint)                 
         XZ_joint[:, :, ic:ic+1, jc:jc+1] = X_batch_joint
@@ -303,7 +302,7 @@ mi_ABC_list = np.mean(mi_ABC_array, axis=1)
 # ### Take the mean of I(A:BC) at different t
 save_dir = 'results_cmi_nc'
 os.makedirs(save_dir, exist_ok=True)
-filename = f'./results_cmi_nc/mi_ABC_array.npy'
+filename = f'mi_ABC_array.npy'
 np.save(os.path.join(save_dir, filename), mi_ABC_array)
 
 filename = f'./results_cmi_nc/mi_ABC_array.npy'
