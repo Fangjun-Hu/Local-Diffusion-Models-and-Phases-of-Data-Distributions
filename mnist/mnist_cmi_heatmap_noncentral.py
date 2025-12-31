@@ -178,17 +178,17 @@ def sample_batch(X_samples, Z_samples, batch_size=500, reshuffle=True, resample_
         X_batch_marg = X_batch_joint[idx_marg]
         Z_batch_marg = Z_batch_joint[idx_marg]
 
-    l = Ls//2
+    ic, jc = 9, 9
     if resample_surroundings == True:
         XZ_joint = deepcopy(Z_batch_joint)                 
-        XZ_joint[:, :, l:l+1, l:l+1] = X_batch_joint
+        XZ_joint[:, :, ic:ic+1, jc:jc+1] = X_batch_joint
         XZ_marg = deepcopy(Z_batch_marg)                
-        XZ_marg[: , :, l:l+1, l:l+1] = X_batch_joint   # Keep the center unchanged
+        XZ_marg[: , :, ic:ic+1, jc:jc+1] = X_batch_joint   # Keep the center unchanged
     else:
         XZ_joint = deepcopy(Z_batch_joint)              
-        XZ_joint[:, :, l:l+1, l:l+1] = X_batch_joint
+        XZ_joint[:, :, ic:ic+1, jc:jc+1] = X_batch_joint
         XZ_marg = deepcopy(Z_batch_joint)                  # Keep the surroundings unchanged
-        XZ_marg[: , :, l:l+1, l:l+1] = X_batch_marg
+        XZ_marg[: , :, ic:ic+1, jc:jc+1] = X_batch_marg
 
     return XZ_joint, XZ_marg
 
